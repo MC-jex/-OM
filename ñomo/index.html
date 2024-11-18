@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Invocar al Ñomo</title>
+    <h1>ÑOMOS DE JONA</h1>
+    <style>
+        body {
+            overflow: hidden; /* Para evitar scrollbars cuando los ñomos se muevan */
+        }
+        #invocarBtn, #invocarTitanBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: rgb(0, 0, 0);
+            background-color: #61d6df;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+        #invocarBtn:hover, #invocarTitanBtn:hover {
+            background-color: #ffffff;
+        }
+        .gnomo {
+            position: absolute;
+            width: 100px;
+            animation: moveAcross 5s linear infinite;
+        }
+        .gnomo-chico {
+            position: absolute;
+            width: 50px;
+            animation: moveRandom 2s linear infinite;
+        }
+        .gnomo-titan {
+            position: absolute;
+            width: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        @keyframes moveAcross {
+            from { left: 0; }
+            to { left: 100vw; }
+        }
+        @keyframes moveRandom {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(25vw, 50vh); }
+            50% { transform: translate(50vw, 75vh); }
+            75% { transform: translate(75vw, 25vh); }
+            100% { transform: translate(0, 0); }
+        }
+        @keyframes moveDiagonal {
+            0% { top: 0; left: 0; }
+            100% { top: 100vh; left: 100vw; }
+        }
+        @keyframes moveCircle {
+            0% { transform: translate(50vw, 50vh); }
+            25% { transform: translate(60vw, 60vh); }
+            50% { transform: translate(70vw, 50vh); }
+            75% { transform: translate(60vw, 40vh); }
+            100% { transform: translate(50vw, 50vh); }
+        }
+        @keyframes moveBounce {
+            0%, 100% { top: 10vh; left: 10vw; }
+            25% { top: 10vh; left: 90vw; }
+            50% { top: 90vh; left: 90vw; }
+            75% { top: 90vh; left: 10vw; }
+        }
+        @keyframes colorChange {
+            0% { background-color: black; }
+            16% { background-color: green; }
+            32% { background-color: blue; }
+            48% { background-color: lightblue; }
+            64% { background-color: purple; }
+            80% { background-color: white; }
+            100% { background-color: black; }
+        }
+    </style>
+</head>
+<body>
+    <button id="invocarBtn">ñomos</button>
+    <button id="invocarTitanBtn">ñomo titan</button>
+    <img id="gnomo" src="ñomo.png" class="gnomo" style="display: none;" />
+    <img id="gnomoTitan" src="ñomo.png" class="gnomo-titan" />
+    <audio id="audio" src="ñomo.mp3"></audio>
+    
+    <script>
+        let intervalId;
+        let audioIntervalId;
+        let gnomosGenerados = [];
+
+        document.getElementById('invocarBtn').addEventListener('click', function() {
+            iniciarAnimacion();
+        });
+
+        document.getElementById('invocarTitanBtn').addEventListener('click', function() {
+            invocarTitan();
+        });
+
+        function iniciarAnimacion() {
+            // Mostrar y mover el gnomo grande de izquierda a derecha
+            var gnomo = document.getElementById('gnomo');
+            gnomo.style.display = 'block';
+
+            // Función para crear ñomos pequeños
+            function crearGnomoChico() {
+                let gnomoChico = document.createElement('img');
+                gnomoChico.src = 'ñomo.png';
+                gnomoChico.className = 'gnomo-chico';
+                let animaciones = ['moveDiagonal', 'moveCircle', 'moveRandom', 'moveBounce'];
+                let animacion = animaciones[Math.floor(Math.random() * animaciones.length)];
+                gnomoChico.style.animationName = animacion;
+                document.body.appendChild(gnomoChico);
+                gnomosGenerados.push(gnomoChico);
+
+                if (gnomosGenerados.length === 15) {
+                    iniciarCambioDeColor();
+                }
+            }
+
+            let contador = 0;
+            // Crear 8 ñomos pequeños cada 1 segundo
+            intervalId = setInterval(() => {
+                for (let i = 0; i < 8; i++) {
+                    crearGnomoChico();
+                    contador++;
+                }
+            }, 1000);
+
+            // Reproducir el audio cada 2 segundos con volumen variable
+            audioIntervalId = setInterval(() => {
+                var audio = document.getElementById('audio');
+                audio.volume = Math.random(); // Ajusta el volumen aleatoriamente entre 0 y 1
+                audio.play();
+            }, 2000);
+        }
+
+        function iniciarCambioDeColor() {
+            document.body.style.animation = 'colorChange 0.5s infinite';
+        }
+
+        function invocarTitan() {
+            // Detener la creación de ñomos pequeños y la reproducción de audio
+            clearInterval(intervalId);
+            clearInterval(audioIntervalId);
+
+            var gnomoTitan = document.getElementById('gnomoTitan');
+            gnomoTitan.style.display = 'block';
+
+            // Cambiar todos los ñomos pequeños a rojo y hacerlos desaparecer
+            for (var i = 0; i < gnomosGenerados.length; i++) {
+                gnomosGenerados[i].style.filter = 'hue-rotate(120deg)'; // Cambia a rojo
+            }
+            setTimeout(() => {
+                for (var i = 0; i < gnomosGenerados.length; i++) {
+                    gnomosGenerados[i].remove();
+                }
+                // Reproducir audio fuerte
+                var audio = document.getElementById('audio');
+                audio.volume = 1.0; // Volumen máximo
+                audio.play();
+            }, 500); // Tiempo para mostrar el cambio a rojo antes de desaparecer
+        }
+    </script>
+</body>
+</html>
